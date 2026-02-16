@@ -1,4 +1,7 @@
-﻿namespace GymBot.Data.Entities
+﻿/// Забыл написать 
+/// Обычно неймспейс описывает иерархию проекта
+/// ИмяПроекта.Папка.Папка....
+namespace GymBot.Data.Entities
 {
 	public class User
 	{
