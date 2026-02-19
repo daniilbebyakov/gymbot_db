@@ -1,6 +1,7 @@
 ﻿using GymBot.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-namespace GymBot.Data
+
+namespace GymBot.Data.Data
 {
     public class GymBotContext : DbContext
     {
@@ -29,6 +30,7 @@ namespace GymBot.Data
             {
                 e.ToTable("Workouts");
                 e.HasKey(x => x.Id);
+                e.Property(x => x.Name).HasColumnName("name").HasMaxLength(255);
                 e.Property(x => x.Id).HasColumnName("id");
                 e.Property(x => x.UserId).HasColumnName("user_id");
                 e.Property(x => x.Date).HasColumnName("date");
@@ -64,7 +66,7 @@ namespace GymBot.Data
                 });
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasColumnName("id");
-                e.Property(x => x.ExerciseId).HasColumnName("exercise_d");
+                e.Property(x => x.ExerciseId).HasColumnName("exercise_id");
                 e.Property(x => x.Reps).HasColumnName("reps");
                 e.Property(x => x.Weight).HasColumnName("weight").HasPrecision(8, 2);
                 e.Property(x => x.Date).HasColumnName("date").HasDefaultValueSql("now()");
@@ -83,7 +85,7 @@ namespace GymBot.Data
                 });
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Id).HasColumnName("id");
-                e.Property(x => x.UserId).HasColumnName("userId");
+                e.Property(x => x.UserId).HasColumnName("user_id");
                 e.Property(x => x.Weight).HasColumnName("weight").HasPrecision(6, 2).IsRequired();
                 e.Property(x => x.Date).HasColumnName("date").HasDefaultValueSql("now()");
                 e.HasIndex(x => x.UserId).HasDatabaseName("id_bodymetrics_userid");
@@ -94,35 +96,6 @@ namespace GymBot.Data
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_bodymetrics_user");
             });
-        }
-    }
-    public class UserRepository
-    {
-        private readonly GymBotContext _context;
-        public UserRepository(GymBotContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<bool> AddUserIfNotExist(long tgId, string username)
-        {
-            bool exists = await _context.Users.AnyAsync(u => u.TgId == tgId);
-            if (exists) return false;
-            try
-            {
-                _context.Users.Add(new Entities.User
-                {
-                    TgId = tgId,
-                    Username = username ?? ""
-                });
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.InnerException?.Message);
-            }
-            return true;
         }
     }
 }

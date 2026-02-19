@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GymBot.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class GymSchema : Migration
+    public partial class GymDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,7 @@ namespace GymBot.Data.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    userId = table.Column<long>(type: "bigint", nullable: false),
+                    user_id = table.Column<long>(type: "bigint", nullable: false),
                     weight = table.Column<decimal>(type: "numeric(6,2)", precision: 6, scale: 2, nullable: false),
                     date = table.Column<DateOnly>(type: "date", nullable: false, defaultValueSql: "now()")
                 },
@@ -42,7 +42,7 @@ namespace GymBot.Data.Migrations
                     table.CheckConstraint("check_body_weight", "weight > 0");
                     table.ForeignKey(
                         name: "FK_bodymetrics_user",
-                        column: x => x.userId,
+                        column: x => x.user_id,
                         principalTable: "Users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -54,6 +54,7 @@ namespace GymBot.Data.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     user_id = table.Column<long>(type: "bigint", nullable: false),
                     date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
@@ -95,7 +96,7 @@ namespace GymBot.Data.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    exercise_d = table.Column<long>(type: "bigint", nullable: false),
+                    exercise_id = table.Column<long>(type: "bigint", nullable: false),
                     reps = table.Column<int>(type: "integer", nullable: false),
                     weight = table.Column<decimal>(type: "numeric(8,2)", precision: 8, scale: 2, nullable: false),
                     date = table.Column<DateOnly>(type: "date", nullable: false, defaultValueSql: "now()")
@@ -107,7 +108,7 @@ namespace GymBot.Data.Migrations
                     table.CheckConstraint("check_sets_weight", "weight >= 0");
                     table.ForeignKey(
                         name: "FK_sets_exercise",
-                        column: x => x.exercise_d,
+                        column: x => x.exercise_id,
                         principalTable: "Exercises",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -126,7 +127,7 @@ namespace GymBot.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "id_sets_exercise_id",
                 table: "Sets",
-                column: "exercise_d");
+                column: "exercise_id");
 
             migrationBuilder.CreateIndex(
                 name: "id_bodymetrics_date",
@@ -136,7 +137,7 @@ namespace GymBot.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "id_bodymetrics_userid",
                 table: "UserBodyMetrics",
-                column: "userId");
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_id",
