@@ -10,20 +10,6 @@ namespace GymBot.Data.Data.Repositories
         {
             _context = context;
         }
-        public async Task<Workout> AddWorkout(long tgId, string wName)
-        {
-            var user= await _context.Users.FirstOrDefaultAsync(u=>u.TgId == tgId) 
-                ?? throw new InvalidOperationException("Пользователь не зарегистрирован");
-            var workout = new Workout
-            {
-                Name = wName,
-                UserId = user.Id,
-                Date = DateOnly.FromDateTime(DateTime.UtcNow)
-            };
-            _context.Workouts.Add(workout);
-            await _context.SaveChangesAsync();
-            return workout;
-        }
         public sealed record WorkoutExerciseDto(string Name, decimal Weight, int Reps, int Sets);
         public async Task<long> SaveWorkout(long tgId, DateOnly workoutDate, string workoutTemplate,
             IReadOnlyCollection<WorkoutExerciseDto> exercises)

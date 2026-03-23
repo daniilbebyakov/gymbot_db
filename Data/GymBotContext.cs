@@ -10,6 +10,8 @@ namespace GymBot.Data.Data
         public DbSet<Exercise> Exercises => Set<Exercise>();
         public DbSet<SetEntry> Sets => Set<SetEntry>();
         public DbSet<UserBodyMetric> UserBodyMetrics => Set<UserBodyMetric>();
+        public DbSet<WorkoutTemplate> WorkoutTemplates => Set<WorkoutTemplate>();
+        public DbSet<WorkoutTemplateExercise> WorkoutTemplateExercises => Set<WorkoutTemplateExercise>();
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseNpgsql("Host=localhost;Port=5432;Username=gymbotuser;Password=gymbotpass;Database=gymbot_db");
@@ -95,6 +97,20 @@ namespace GymBot.Data.Data
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_bodymetrics_user");
+            });
+            modelBuilder.Entity<WorkoutTemplate>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Name).IsRequired().HasMaxLength(100);
+                entity.HasMany(x => x.Exercises)
+                    .WithOne(x => x.WorkoutTemplate!)
+                    .HasForeignKey(x => x.WorkoutTemplateId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<WorkoutTemplateExercise>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.ExerciseName).IsRequired().HasMaxLength(100);
             });
         }
     }
