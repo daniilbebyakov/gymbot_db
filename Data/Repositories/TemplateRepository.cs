@@ -7,25 +7,28 @@ using System.Text;
 namespace GymBot.Data.Data.Repositories
 {
 
-    public class TemplateRepository
+    public class TemplateRepository(GymBotContext context)
     {
-        private readonly GymBotContext _context;
-        public TemplateRepository(GymBotContext context)
-        {
-            _context = context;
-        }
-        public async Task<long> CreateTemplate(long userId,string name,List<TemplateExerciseDto> exercises)
+        private readonly GymBotContext _context = context;
+        public async Task<long> CreateTemplate(long userId, string name, List<string> exercises)
         {
             var template = new WorkoutTemplate
             {
                 UserId = userId,
                 Name = name.Trim(),
-                Exercises = exercises.Select(x => new WorkoutTemplateExercise
-                {
-                    ExerciseName = x.ExerciseName,
-                }).ToList()
             };
             _context.WorkoutTemplates.Add(template);
+            await _context.SaveChangesAsync();
+            var normalized = exercises.Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).ToList()
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToList();
+            var rows = normalized.Select((name) => new WorkoutTemplateExercise
+            {
+                WorkoutTemplateId = template.Id,
+                ExerciseName = name,
+            });
+            _context.WorkoutTemplateExercises.AddRange(rows);
             await _context.SaveChangesAsync();
             return template.Id;
         }
@@ -43,6 +46,5 @@ namespace GymBot.Data.Data.Repositories
                 .Include(x => x.Exercises)
                 .FirstOrDefaultAsync(x => x.Id == templateId && x.UserId == userId);
         }
-        public record TemplateExerciseDto(string ExerciseName);
     }
 }
