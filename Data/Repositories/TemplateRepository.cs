@@ -1,8 +1,5 @@
 ﻿using GymBot.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GymBot.Data.Data.Repositories
 {
@@ -45,6 +42,18 @@ namespace GymBot.Data.Data.Repositories
             return await _context.WorkoutTemplates
                 .Include(x => x.Exercises)
                 .FirstOrDefaultAsync(x => x.Id == templateId && x.UserId == userId);
+        }
+        public async Task<bool> DeleteTemplate(long templateId, long userId)
+        {
+            var template=await _context.WorkoutTemplates
+                .FirstOrDefaultAsync(x=>x.Id == templateId && x.UserId == userId);
+            if (template is null)
+            {
+                return false;
+            }
+            _context.WorkoutTemplates.Remove(template);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
